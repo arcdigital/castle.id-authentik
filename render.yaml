@@ -94,7 +94,7 @@ services:
   - type: redis
     name: castle-id-cache
     region: oregon
-    plan: free
+    plan: starter
     maxmemoryPolicy: allkeys-lru
     ipAllowList: []
 
@@ -114,12 +114,14 @@ envVarGroups:
       - key: AUTHENTIK_EMAIL__HOST
         value: smtp.postmarkapp.com
       - key: AUTHENTIK_EMAIL__PORT
-        value: 2525
+        value: 587
       - key: AUTHENTIK_EMAIL__USERNAME
         sync: false
       - key: AUTHENTIK_EMAIL__PASSWORD
         sync: false
       - key: AUTHENTIK_EMAIL__USE_TLS
         value: true
+      - key: AUTHENTIK_EMAIL__USE_SSL
+        value: false
       - key: AUTHENTIK_EMAIL__FROM
         value: CastleID <sso@castle.id>
