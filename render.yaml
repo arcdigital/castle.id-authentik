@@ -1,0 +1,125 @@
+databases:
+  - name: castle-id-db
+    region: oregon
+    plan: starter
+    databaseName: authentik
+    ipAllowList: []
+
+services:
+  - type: web
+    name: castle-id
+    runtime: image
+    region: oregon
+    plan: starter
+    dockerCommand: /usr/local/bin/dumb-init -- /lifecycle/ak server
+    healthCheckPath: /-/health/live
+    domains:
+      - castle.id
+    image:
+      url: ghcr.io/goauthentik/server:2023.8.2
+    envVars:
+      - key: AUTHENTIK_REDIS__HOST
+        fromService:
+          type: redis
+          name: castle-id-cache
+          property: host
+      - key: AUTHENTIK_REDIS__PORT
+        fromService:
+          type: redis
+          name: castle-id-cache
+          property: port
+      - key: AUTHENTIK_POSTGRESQL__HOST
+        fromDatabase:
+          name: castle-id-db
+          property: host
+      - key: AUTHENTIK_POSTGRESQL__PORT
+        fromDatabase:
+          name: castle-id-db
+          property: port
+      - key: AUTHENTIK_POSTGRESQL__NAME
+        fromDatabase:
+          name: castle-id-db
+          property: database
+      - key: AUTHENTIK_POSTGRESQL__USER
+        fromDatabase:
+          name: castle-id-db
+          property: user
+      - key: AUTHENTIK_POSTGRESQL__PASSWORD
+        fromDatabase:
+          name: castle-id-db
+          property: password
+      - key: PORT
+        value: 9000
+      - fromGroup: castle-id
+  - type: worker
+    name: castle-id-worker
+    runtime: image
+    region: oregon
+    plan: starter
+    dockerCommand: /usr/local/bin/dumb-init -- /lifecycle/ak worker
+    image:
+      url: ghcr.io/goauthentik/server:2023.8.2
+    envVars:
+      - key: AUTHENTIK_REDIS__HOST
+        fromService:
+          type: redis
+          name: castle-id-cache
+          property: host
+      - key: AUTHENTIK_REDIS__PORT
+        fromService:
+          type: redis
+          name: castle-id-cache
+          property: port
+      - key: AUTHENTIK_POSTGRESQL__HOST
+        fromDatabase:
+          name: castle-id-db
+          property: host
+      - key: AUTHENTIK_POSTGRESQL__PORT
+        fromDatabase:
+          name: castle-id-db
+          property: port
+      - key: AUTHENTIK_POSTGRESQL__NAME
+        fromDatabase:
+          name: castle-id-db
+          property: database
+      - key: AUTHENTIK_POSTGRESQL__USER
+        fromDatabase:
+          name: castle-id-db
+          property: user
+      - key: AUTHENTIK_POSTGRESQL__PASSWORD
+        fromDatabase:
+          name: castle-id-db
+          property: password
+      - fromGroup: castle-id
+  - type: redis
+    name: castle-id-cache
+    region: oregon
+    plan: free
+    maxmemoryPolicy: allkeys-lru
+    ipAllowList: []
+
+envVarGroups:
+  - name: castle-id
+    envVars:
+      - key: AUTHENTIK_SECRET_KEY
+        sync: false
+      - key: AUTHENTIK_ERROR_REPORTING__ENABLED
+        value: false
+      - key: AUTHENTIK_DEFAULT_USER_CHANGE_NAME
+        value: false
+      - key: AUTHENTIK_DEFAULT_USER_CHANGE_EMAIL
+        value: false
+      - key: AUTHENTIK_DEFAULT_USER_CHANGE_USERNAME
+        value: false
+      - key: AUTHENTIK_EMAIL__HOST
+        value: smtp.postmarkapp.com
+      - key: AUTHENTIK_EMAIL__PORT
+        value: 2525
+      - key: AUTHENTIK_EMAIL__USERNAME
+        sync: false
+      - key: AUTHENTIK_EMAIL__PASSWORD
+        sync: false
+      - key: AUTHENTIK_EMAIL__USE_TLS
+        value: true
+      - key: AUTHENTIK_EMAIL__FROM
+        value: CastleID <sso@castle.id>
