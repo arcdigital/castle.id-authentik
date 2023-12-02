@@ -11,7 +11,7 @@ services:
     runtime: image
     region: oregon
     plan: starter
-    dockerCommand: /usr/local/bin/dumb-init -- /lifecycle/ak server
+    dockerCommand: dumb-init -- /lifecycle/ak server
     healthCheckPath: /-/health/live
     domains:
       - castle.id
@@ -58,7 +58,7 @@ services:
     runtime: image
     region: oregon
     plan: starter
-    dockerCommand: /usr/local/bin/dumb-init -- /lifecycle/ak worker
+    dockerCommand: dumb-init -- /lifecycle/ak worker
     image:
       url: ghcr.io/goauthentik/server:2023.10.4
     envVars:
