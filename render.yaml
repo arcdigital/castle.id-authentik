@@ -18,7 +18,7 @@ services:
       - discord.castle.id
       - github.castle.id
     image:
-      url: ghcr.io/goauthentik/server:2023.8.3
+      url: ghcr.io/goauthentik/server:2023.10.4
     envVars:
       - key: AUTHENTIK_REDIS__HOST
         fromService:
@@ -60,7 +60,7 @@ services:
     plan: starter
     dockerCommand: /usr/local/bin/dumb-init -- /lifecycle/ak worker
     image:
-      url: ghcr.io/goauthentik/server:2023.8.3
+      url: ghcr.io/goauthentik/server:2023.10.4
     envVars:
       - key: AUTHENTIK_REDIS__HOST
         fromService:
